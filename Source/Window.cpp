@@ -625,10 +625,16 @@ cPosition cWindow::GetWindowPosition() const {
 
 cDimension cWindow::GetWindowSize() const {
 #ifdef __VITA__
-	return cDimension(
-		(int32)((float)mOriginalResolution.mWidth * 2.7f),
-		(int32)((float)mOriginalResolution.mHeight * 2.7f)
-	);
+	if (mOriginalResolution.mHeight == 225) // Amiga
+		return cDimension(
+			(int32)((float)mOriginalResolution.mWidth * 2.4f),
+			(int32)((float)mOriginalResolution.mHeight * 2.4f)
+		);
+	else
+		return cDimension(
+			(int32)((float)mOriginalResolution.mWidth * 2.7f),
+			(int32)((float)mOriginalResolution.mHeight * 2.7f)
+		);
 #else
 	return cDimension( mOriginalResolution.mWidth * mScaler, mOriginalResolution.mHeight * mScaler ); 
 #endif
@@ -636,7 +642,11 @@ cDimension cWindow::GetWindowSize() const {
 
 int32 cWindow::GetWindowWidth() const {
 #ifdef __VITA__
-	return (int32)((float)mOriginalResolution.mWidth * 2.7f);
+	if (mOriginalResolution.mHeight == 225) { // Amiga
+		return (int32)((float)mOriginalResolution.mWidth * 2.4f);
+	} else { // Dos
+		return (int32)((float)mOriginalResolution.mWidth * 2.7f);
+	}
 #else
 	return mOriginalResolution.mWidth * mScaler;
 #endif
@@ -644,7 +654,11 @@ int32 cWindow::GetWindowWidth() const {
 
 int32 cWindow::GetWindowHeight() const {
 #ifdef __VITA__
-	return (int32)((float)mOriginalResolution.mHeight * 2.7f);
+	if (mOriginalResolution.mHeight == 225) { // Amiga
+		return (int32)((float)mOriginalResolution.mHeight * 2.4f);
+	} else { // Dos
+		return (int32)((float)mOriginalResolution.mHeight * 2.7f);
+	}
 #else
 	return mOriginalResolution.mHeight * mScaler;
 #endif
