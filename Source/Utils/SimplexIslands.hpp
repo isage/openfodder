@@ -14,7 +14,10 @@
  * attribution is appreciated.
  *
  */
+
 #include <math.h>
+#include <stdint.h>
+
 struct Grad
 {
 	double x, y, z, w;
