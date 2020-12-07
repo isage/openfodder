@@ -25,6 +25,7 @@ class cWindow {
 	protected:
 		SDL_Window*			mWindow;
 		SDL_Renderer*		mRenderer;
+		SDL_Joystick*		mJoy;
 
         std::vector<cEvent> mEvents;
 

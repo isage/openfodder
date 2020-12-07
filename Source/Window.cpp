@@ -52,7 +52,7 @@ cWindow::~cWindow() {
 }
 
 bool cWindow::InitWindow( const std::string& pWindowTitle ) {
-	
+	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         g_Debugger->Error("Failed to initialise SDL");
 		exit( 1 );
@@ -74,8 +74,15 @@ bool cWindow::InitWindow( const std::string& pWindowTitle ) {
 		exit( 1 );
 		return false;
 	}
-
 	SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, 0 );
+
+
+	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+	if (SDL_NumJoysticks() > 0)
+	{
+		mJoy = SDL_JoystickOpen(0);
+	}
+
 
 	SetCursor();
 
@@ -152,7 +159,7 @@ void cWindow::EventCheck() {
 			Event.mType = eEvent_KeyUp;
 			Event.mButton = SysEvent.key.keysym.scancode;
 			break;
-
+#ifndef __VITA__
 		case SDL_MULTIGESTURE:
 			Event.mType = eEvent_MouseRightDown;
 			Event.mButton = 3;
@@ -243,9 +250,89 @@ void cWindow::EventCheck() {
 			Event.mPosition = cPosition(SysEvent.motion.x, SysEvent.motion.y);
 			Event.mButtonCount = SysEvent.button.clicks;
 			break;
-
+#endif
 		case SDL_QUIT:
 			Event.mType = eEvent_Quit;
+			break;
+		case SDL_JOYBUTTONDOWN:
+			switch (SysEvent.jbutton.button) {
+				case 0:
+					Event.mType = eEvent_KeyDown;
+					Event.mButton = SDL_SCANCODE_M;
+					break;
+				case 3:
+					Event.mType = eEvent_KeyDown;
+					Event.mButton = SDL_SCANCODE_SPACE;
+					break;
+				case 10:
+					Event.mType = eEvent_KeyDown;
+					Event.mButton = SDL_SCANCODE_ESCAPE;
+					break;
+				case 11:
+					Event.mType = eEvent_KeyDown;
+					Event.mButton = SDL_SCANCODE_P;
+					break;
+				case 2:
+				case 4:
+					Event.mType = eEvent_MouseLeftDown;
+					Event.mButton = 1;
+					Event.mPosition = cPosition(GetWindowSize().getCentre());
+					Event.mButtonCount = 1;
+					break;
+				case 1:
+				case 5:
+					Event.mType = eEvent_MouseRightDown;
+					Event.mButton = 3;
+					Event.mPosition = cPosition(GetWindowSize().getCentre());
+					Event.mButtonCount = 1;
+					break;
+			}
+			break;
+		case SDL_JOYBUTTONUP:
+			switch (SysEvent.jbutton.button) {
+				case 0:
+					Event.mType = eEvent_KeyUp;
+					Event.mButton = SDL_SCANCODE_M;
+					break;
+				case 3:
+					Event.mType = eEvent_KeyUp;
+					Event.mButton = SDL_SCANCODE_SPACE;
+					break;
+				case 10:
+					Event.mType = eEvent_KeyUp;
+					Event.mButton = SDL_SCANCODE_ESCAPE;
+					break;
+				case 11:
+					Event.mType = eEvent_KeyUp;
+					Event.mButton = SDL_SCANCODE_P;
+					break;
+				case 2:
+				case 4:
+					Event.mType = eEvent_MouseLeftUp;
+					Event.mButton = 1;
+					Event.mPosition = cPosition(GetWindowSize().getCentre());
+					Event.mButtonCount = 1;
+					break;
+				case 1:
+				case 5:
+					Event.mType = eEvent_MouseRightUp;
+					Event.mButton = 3;
+					Event.mPosition = cPosition(GetWindowSize().getCentre());
+					Event.mButtonCount = 1;
+					break;
+			}
+			break;
+		case SDL_JOYAXISMOTION:
+			switch (SysEvent.jaxis.axis) {
+				case 0:
+				case 1:
+					Sint16 x_move, y_move;
+					x_move = SDL_JoystickGetAxis(mJoy, 0);
+					y_move = SDL_JoystickGetAxis(mJoy, 1);
+					Event.mType = eEvent_MouseMove;
+					Event.mPosition = cPosition(GetWindowSize().getCentre() + cPosition(x_move / 1800, y_move / 1800));
+					break;
+			}
 			break;
 		}
 
