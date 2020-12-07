@@ -624,15 +624,30 @@ cPosition cWindow::GetWindowPosition() const {
 }
 
 cDimension cWindow::GetWindowSize() const {
+#ifdef __VITA__
+	return cDimension(
+		(int32)((float)mOriginalResolution.mWidth * 2.7f),
+		(int32)((float)mOriginalResolution.mHeight * 2.7f)
+	);
+#else
 	return cDimension( mOriginalResolution.mWidth * mScaler, mOriginalResolution.mHeight * mScaler ); 
+#endif
 }
 
 int32 cWindow::GetWindowWidth() const {
+#ifdef __VITA__
+	return (int32)((float)mOriginalResolution.mWidth * 2.7f);
+#else
 	return mOriginalResolution.mWidth * mScaler;
+#endif
 }
 
 int32 cWindow::GetWindowHeight() const {
+#ifdef __VITA__
+	return (int32)((float)mOriginalResolution.mHeight * 2.7f);
+#else
 	return mOriginalResolution.mHeight * mScaler;
+#endif
 }
 
 bool cWindow::HasFocus() {
