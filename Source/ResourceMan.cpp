@@ -28,6 +28,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef __VITA__
+#include "Utils/scandir.hpp"
+#endif
+
 const char* EXTENSION_SAVEGAME = ".ofg";
 const char* EXTENSION_CAMPAIGN = ".ofc";
 const char* EXTENSION_MAP = ".map";
@@ -65,6 +69,10 @@ void cResourceMan::addDefaultDirs() {
 
 	if (path.size())
 		addBaseDir(path + "/Documents/");
+	addBaseDir("ux0:/data/");
+#else
+#ifdef __VITA__
+	addBaseDir("ux0:/data/");
 #else
 	char* path1 = std::getenv("XDG_DATA_DIRS");
 	if (path1) {
@@ -82,6 +90,7 @@ void cResourceMan::addDefaultDirs() {
 		addBaseDir(path + "/.local/share/");
 	}
 	addBaseDir("/usr/local/share/");
+#endif
 #endif
 }
 
@@ -576,7 +585,11 @@ std::string findType;
 
 std::string cResourceMan::getcwd() {
 	char buff[1024];
+#ifdef __VITA__
+	sprintf(buff,"app0:/");
+#else
 	::getcwd(buff, 1024);
+#endif
 	std::string cwd(buff);
 	return cwd;
 }
