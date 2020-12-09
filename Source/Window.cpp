@@ -254,6 +254,7 @@ void cWindow::EventCheck() {
 		case SDL_QUIT:
 			Event.mType = eEvent_Quit;
 			break;
+#ifdef __VITA__
 		case SDL_JOYBUTTONDOWN:
 			switch (SysEvent.jbutton.button) {
 				case 0:
@@ -334,6 +335,27 @@ void cWindow::EventCheck() {
 					break;
 			}
 			break;
+		case SDL_FINGERDOWN:
+			Event.mType = (SysEvent.tfinger.touchId == 0) ? eEvent_TouchFrontDown : eEvent_TouchBackDown;
+			Event.mButton = (SysEvent.tfinger.touchId == 0) ? 1 : 3;
+			Event.mPosition = cPosition((unsigned int)(SysEvent.tfinger.x * 960.) - ((960 - GetWindowWidth()) / 2),
+										(unsigned int)(SysEvent.tfinger.y * 544.) - ((544 - GetWindowHeight()) / 2));
+			Event.mButtonCount = 1;
+			break;
+
+		case SDL_FINGERUP:
+			Event.mType = (SysEvent.tfinger.touchId == 0) ? eEvent_TouchFrontUp : eEvent_TouchBackUp;
+			Event.mButton = (SysEvent.tfinger.touchId == 0) ? 1 : 3;
+			Event.mPosition = cPosition((unsigned int)(SysEvent.tfinger.x * 960.) - ((960 - GetWindowWidth()) / 2),
+										(unsigned int)(SysEvent.tfinger.y * 544.) - ((544 - GetWindowHeight()) / 2));
+			Event.mButtonCount = 1;
+			break;
+		case SDL_FINGERMOTION:
+			Event.mType = (SysEvent.tfinger.touchId == 0) ? eEvent_TouchFrontMove : eEvent_TouchBackMove;
+			Event.mPosition = cPosition((unsigned int)(SysEvent.tfinger.x * 960.) - ((960 - GetWindowWidth()) / 2) ,
+										(unsigned int)(SysEvent.tfinger.y * 544.) - ((544 - GetWindowHeight()) / 2));
+			break;
+#endif
 		}
 
 #ifdef EMSCRIPTEN

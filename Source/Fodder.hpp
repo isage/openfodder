@@ -161,6 +161,10 @@ public:
     uint32          mMouse_EventLastButtonsPressed;
     cPosition       mMouse_EventLastWheel;
     bool            mMouse_Locked;
+#ifdef __VITA__
+    cPosition       mTouch_EventLastPosition;
+    bool            mProcess_Touch;
+#endif
 
     bool            mSquad_Member_Fire_CoolDown_Override;
 
@@ -1245,6 +1249,9 @@ public:
     int16           Mouse_Button_Left_Toggled();
     int16           Mouse_Button_Right_Toggled();
     void            Mouse_Cursor_Handle();
+#ifdef __VITA__
+    void            Touch_Cursor_Handle();
+#endif
     void            Mouse_Cursor_Update();
     void            Mouse_DrawCursor();
     virtual void    Mouse_Inputs_Get();

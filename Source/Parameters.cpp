@@ -342,7 +342,11 @@ std::string str_to_lower(std::string pStr) {
 
 bool sFodderParameters::ProcessINI() {
 
+#ifdef __VITA__
+	INI<> ini("ux0:/data/OpenFodder/openfodder.ini", false);
+#else
 	INI<> ini("openfodder.ini", false);
+#endif
 
 	if (!ini.parse())
 		return false;
@@ -350,6 +354,7 @@ bool sFodderParameters::ProcessINI() {
 	// Section: Openfodder
 	{
 		if (ini.select("openfodder")) {
+#ifndef __VITA__
 			if (ini.get("window", "false") == "true")
 				mWindowMode = true;
 			else
@@ -380,6 +385,15 @@ bool sFodderParameters::ProcessINI() {
 
 			if (ini.get("alternate-mouse", "false") == "true")
 				mMouseAlternative = true;
+#endif
+
+			if (ini.get("use-touch", "false") == "front")
+				mTouchFront = true;
+			else if (ini.get("use-touch", "false") == "both")
+			{
+				mTouchFront = true;
+				mTouchBack = true;
+			}
 		}
 	}
 

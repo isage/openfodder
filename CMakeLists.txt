@@ -15,7 +15,7 @@ project(openfodder CXX)
 
 set (openfodder_VERSION_MAJOR 1)
 set (openfodder_VERSION_MINOR 6)
-set (openfodder_VERSION_RELEASE 0)
+set (openfodder_VERSION_RELEASE 1)
 
 include(CheckCXXCompilerFlag)
 include(GNUInstallDirs)

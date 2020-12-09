@@ -33,6 +33,9 @@ Left stick: control cursor
 Start: pause  
 Select: give up/quit to menu
 
+There's also touch support (disabled by default).  
+To enable it copy `openfodder.ini` to `ux0:/data/OpenFodder` and adjust use-touch setting.
+
 #### How to play
 
 Open Fodder supports six demos from the Amiga platform, and three retail releases (See below for supported versions).

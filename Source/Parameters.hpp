@@ -77,6 +77,11 @@ public:
 
 	bool mShowHelp;
 
+#ifdef __VITA__
+	bool mTouchFront;
+	bool mTouchBack;
+#endif
+
 	sFodderParameters() {
 		clear();
 	}
@@ -125,6 +130,10 @@ public:
 		mSinglePhase = false;
 		mSpritesMax = 45;
 		mSpawnEnemyMax = 10;
+#ifdef __VITA__
+		mTouchFront = false;
+		mTouchBack = false;
+#endif
 	}
 
 protected:

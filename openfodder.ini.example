@@ -5,25 +5,9 @@
 
 [openfodder]
 
-; Start the game in a window
-window=true
 
-; Enable cheat keys
-cheats=false
-
-; Window size multipler by original game resolution (Amiga 320x225, Dos 320x200)
-; auto finds a size approximately half your screen resolution
-; values such as 1, 2 or 3+ are multiples of the original resolution
-scale=auto
-
-; Number of map tiles to draw horizontally (0 for platform default)
-columns=0
-
-; Number of map tiles to draw vertically (0 for platform default)
-rows=0
-
-; Don't use mouse grab (this alters the behaviour of the in-game camera window) -- Useful for VMs
-alternate-mouse=false
+; Use touch input. Possible values: false, front, both
+use-touch=false
 
 [paths]
 ; Paths to data base folder

@@ -26,6 +26,13 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+#ifdef __VITA__
+#include <chrono>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+#endif
      
 const int32 CAMERA_PAN_TO_START_ACCELARATION = 0x80000;     // Dos: Original 0x80000
 const int32 CAMERA_PAN_TO_SQUAD_ACCELERATION = 0x20000;     // Dos: Original 0x20000
@@ -87,6 +94,11 @@ cFodder::cFodder(std::shared_ptr<cWindow> pWindow) {
     mMouse_Button_LeftRight_Toggle2 = false;
 
     mMouse_Exit_Loop = false;
+
+#ifdef __VITA__
+    mProcess_Touch = false;
+    mMouse_EventLastPosition = mWindow->GetWindowSize().getCentre();
+#endif
 
     mSprite_Frame_1 = 0;
     mSprite_Frame_Modifier_Update_Countdown = 0;
@@ -2665,6 +2677,59 @@ void cFodder::eventProcess(const cEvent& pEvent) {
         mMouse_EventLastWheel = pEvent.mPosition;
         break;
 
+#ifdef __VITA__
+    case eEvent_TouchFrontDown:
+        if (mStartParams->mTouchFront)
+        {
+            mTouch_EventLastPosition = pEvent.mPosition;
+            mMouse_EventLastButtonsPressed |= 1;
+            mProcess_Touch = true;
+        }
+        break;
+    case eEvent_TouchBackDown:
+        if (mStartParams->mTouchBack)
+        {
+            mTouch_EventLastPosition = pEvent.mPosition;
+            mMouse_EventLastButtonsPressed |= 2;
+            mProcess_Touch = true;
+        }
+        break;
+
+    case eEvent_TouchFrontUp:
+        if (mStartParams->mTouchFront)
+        {
+            mTouch_EventLastPosition = pEvent.mPosition;
+            mMouse_EventLastButtonsPressed &= ~1;
+            mProcess_Touch = true;
+        }
+        break;
+
+    case eEvent_TouchBackUp:
+        if (mStartParams->mTouchBack)
+        {
+            mTouch_EventLastPosition = pEvent.mPosition;
+            mMouse_EventLastButtonsPressed &= ~2;
+            mProcess_Touch = true;
+        }
+        break;
+
+    case eEvent_TouchFrontMove:
+        if (mStartParams->mTouchFront)
+        {
+            mTouch_EventLastPosition = pEvent.mPosition;
+            mProcess_Touch = true;
+        }
+        break;
+
+    case eEvent_TouchBackMove:
+        if (mStartParams->mTouchBack)
+        {
+            mTouch_EventLastPosition = pEvent.mPosition;
+            mProcess_Touch = true;
+        }
+        break;
+#endif
+
     case eEvent_None:
         break;
 
@@ -2814,6 +2879,21 @@ void cFodder::Mouse_Setup() {
     mMouseY = (getCameraHeight() / 2) - 9;
 }
 
+#ifdef __VITA__
+void cFodder::Touch_Cursor_Handle() {
+	if (mProcess_Touch) {
+		const cDimension wSize = mWindow->GetWindowSize();
+		const cDimension sSize = mWindow->GetScreenSize();
+		
+		float x_scale = (float)wSize.getWidth() / (float)sSize.getWidth();
+		float y_scale = (float)wSize.getHeight() / (float)sSize.getHeight();
+		mInputMouseX = (int)((float)mTouch_EventLastPosition.mX / x_scale) + MOUSE_POSITION_X_ADJUST;
+		mInputMouseY = (int)((float)mTouch_EventLastPosition.mY / y_scale) + MOUSE_POSITION_Y_ADJUST;
+		mProcess_Touch = false;
+	}
+}
+#endif
+
 void cFodder::Mouse_Cursor_Handle() {
 	static bool WasClicked = false;
 	static bool CursorGrabbed = false;
@@ -2935,6 +3015,9 @@ void cFodder::Mouse_Inputs_Get() {
     }
     else {
         Mouse_Cursor_Handle();
+#ifdef __VITA__
+        Touch_Cursor_Handle();
+#endif
     }
 
     if (mParams->mDemoRecord)
@@ -8970,6 +9053,21 @@ void cFodder::Game_Save_Wrapper() {
 }
 
 void cFodder::Game_Save() {
+#ifdef __VITA__
+    auto now = std::chrono::system_clock::now();
+    auto t_c = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+
+    std::string Filename = g_ResourceMan->GetSaveNewName();
+    std::ofstream outfile(Filename, std::ofstream::binary);
+    ss << std::put_time(std::localtime(&t_c), "%Y%m%d%H%M%S");
+    outfile << mGame_Data.ToJson(ss.str());
+    outfile.close();
+    g_ResourceMan->refresh();
+    mMouse_Exit_Loop = false;
+#else
+	g_ResourceMan->refresh();
+    mMouse_Exit_Loop = false;
     mInput.clear();
     mGUI_Select_File_String_Input_Callback = 0;
     mSurface->clearBuffer();
@@ -8999,6 +9097,7 @@ void cFodder::Game_Save() {
 
 	g_ResourceMan->refresh();
     mMouse_Exit_Loop = false;
+#endif
 }
 
 void cFodder::String_Input_Print(int16 pPosY) {

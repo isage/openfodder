@@ -31,6 +31,14 @@ enum eEventType {
 	eEvent_MouseRightUp		= 7,
 	eEvent_MouseWheel		= 8,
 	eEvent_Quit				= 10,
+#ifdef __VITA__
+	eEvent_TouchFrontDown	= 20,
+	eEvent_TouchBackDown	= 21,
+	eEvent_TouchFrontUp		= 22,
+	eEvent_TouchBackUp		= 23,
+	eEvent_TouchFrontMove	= 24,
+	eEvent_TouchBackMove	= 25,
+#endif
 };
 
 class cEvent {
