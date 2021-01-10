@@ -22,27 +22,36 @@
 
 #include "stdafx.hpp"
 
+#define PIXELFORMAT SDL_PIXELFORMAT_ARGB8888
+
 cSurface::cSurface( size_t pWidth, size_t pHeight ) {
     mIsLoadedImage = false;
 	mWidth = pWidth; 
 	mHeight = pHeight;
 	mPaletteAdjusting = false;
 
+	Uint32 r_mask, g_mask, b_mask, a_mask;
+	int bpp;
+	SDL_PixelFormatEnumToMasks(PIXELFORMAT, &bpp, &r_mask, &g_mask, &b_mask, &a_mask);
+
 	// Create the screen buffer
-	mSDLSurface = SDL_CreateRGBSurface( 0, (int) pWidth, (int) pHeight, 32, 0xFF << 16, 0xFF << 8, 0xFF, 0 );
+	mSDLSurface = SDL_CreateRGBSurface( 0, (int) pWidth, (int) pHeight, bpp, r_mask, g_mask, b_mask, a_mask );
 	mTexture = 0;
 
 	if (!mSDLSurface) {
 		g_Debugger->Error("SDLSurface not initialised");
+		g_Debugger->Error(SDL_GetError());
 		exit(1);
 	}
-    if (g_Window->GetRenderer()) {
-        mTexture = SDL_CreateTexture(g_Window->GetRenderer(), SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, (int)pWidth, (int)pHeight);
 
-        SDL_SetTextureBlendMode(mTexture, SDL_BLENDMODE_ADD);
-        SDL_SetTextureAlphaMod(mTexture, 0xFF);
-        SDL_SetTextureColorMod(mTexture, 0xFF, 0xFF, 0xFF);
-    }
+	if (g_Window->GetRenderer()) {
+		mTexture = SDL_CreateTexture(g_Window->GetRenderer(), PIXELFORMAT, SDL_TEXTUREACCESS_STREAMING, (int)pWidth, (int)pHeight);
+
+		SDL_SetTextureBlendMode(mTexture, SDL_BLENDMODE_ADD);
+		SDL_SetTextureAlphaMod(mTexture, 0xFF);
+		SDL_SetTextureColorMod(mTexture, 0xFF, 0xFF, 0xFF);
+	}
+
 	mSurfaceBuffer = new uint8[ mWidth * mHeight ];
 	mSurfaceBufferSaved = new uint8[ mWidth * mHeight ];
 	mSurfaceBufferSize = mWidth * mHeight;
